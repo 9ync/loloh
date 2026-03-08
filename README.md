@@ -1,2 +1,1 @@
-# loloh
-feliz dia das cuie
+https://9ync.github.io/loloh/
