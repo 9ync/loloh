@@ -1,8 +1,16 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" translate="no">
+
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+
+  <meta name="google" content="notranslate" />
 
   <title>lohanne</title>
 
@@ -14,37 +22,78 @@
       margin:0;
       padding:0;
       box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html,
+    body{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:#ffffff;
+      touch-action:none;
     }
 
     body{
-      width:100vw;
-      height:100vh;
-      overflow:hidden;
-      background:#ffffff;
-      font-family:"Helvetica Neue", Arial, sans-serif;
+
       position:relative;
+
+      font-family:
+      "Helvetica Neue",
+      Arial,
+      sans-serif;
+
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+
     }
 
     .phrase{
+
       position:absolute;
+
       color:#000;
+
       font-size:11px;
       font-weight:200;
-      letter-spacing:1.5px;
+
+      letter-spacing:1.2px;
+      line-height:1.4;
 
       opacity:0;
+
       filter:blur(10px);
+
       transform:translateY(40px);
 
       white-space:nowrap;
+
       pointer-events:none;
       user-select:none;
+
+      will-change:
+      transform,
+      opacity,
+      filter;
+
+    }
+
+    @media (max-width:768px){
+
+      .phrase{
+
+        font-size:10px;
+        letter-spacing:1px;
+
+      }
+
     }
 
   </style>
+
 </head>
 
-<body>
+<body translate="no">
 
 <script>
 
@@ -78,7 +127,7 @@ const secondaryPhrases = [
   "minha amada.",
   "fabulosa.",
   "bonita.",
-  "perfeita",
+  "perfeita.",
   "gostosa.",
   "maravilhosa.",
   "meu anjinho.",
@@ -96,7 +145,6 @@ function getPhrase(){
 
   const priorityChance = Math.random();
 
-  // frases principais aparecem mais vezes
   if(priorityChance < 0.75){
 
     return repeatedPhrases[
@@ -111,29 +159,94 @@ function getPhrase(){
 
 }
 
+const activePositions = [];
+
+let animationInterval = null;
+
 function createPhrase(){
+
+  if(document.hidden) return;
 
   const phrase = document.createElement("div");
 
-  phrase.classList.add("phrase");
+  phrase.className = "phrase";
+
+  phrase.setAttribute("translate", "no");
 
   phrase.innerText = getPhrase();
 
-  const x = Math.random() * (window.innerWidth - 250);
-  const y = Math.random() * (window.innerHeight - 120);
+  document.body.appendChild(phrase);
+
+  const rect = phrase.getBoundingClientRect();
+
+  const margin = 30;
+
+  const maxX = window.innerWidth - rect.width - margin;
+  const maxY = window.innerHeight - rect.height - margin;
+
+  let x;
+  let y;
+
+  let validPosition = false;
+
+  let tries = 0;
+
+  while(!validPosition && tries < 100){
+
+    x = Math.random() * maxX;
+    y = Math.random() * maxY;
+
+    validPosition = true;
+
+    for(const pos of activePositions){
+
+      const horizontalOverlap =
+
+        x < pos.x + pos.width + 20 &&
+        x + rect.width + 20 > pos.x;
+
+      const verticalOverlap =
+
+        y < pos.y + pos.height + 20 &&
+        y + rect.height + 20 > pos.y;
+
+      if(horizontalOverlap && verticalOverlap){
+
+        validPosition = false;
+        break;
+
+      }
+
+    }
+
+    tries++;
+
+  }
 
   phrase.style.left = `${x}px`;
   phrase.style.top = `${y}px`;
 
-  document.body.appendChild(phrase);
+  const currentPosition = {
+
+    x,
+    y,
+    width: rect.width,
+    height: rect.height
+
+  };
+
+  activePositions.push(currentPosition);
 
   gsap.to(phrase,{
 
     opacity:1,
-    y:-70,
+
+    y:-65,
+
     filter:"blur(0px)",
 
     duration:4,
+
     ease:"power2.out"
 
   });
@@ -141,15 +254,26 @@ function createPhrase(){
   gsap.to(phrase,{
 
     opacity:0,
+
     filter:"blur(8px)",
 
     duration:4,
+
     delay:4,
+
     ease:"power2.in",
 
     onComplete:()=>{
 
       phrase.remove();
+
+      const index = activePositions.indexOf(currentPosition);
+
+      if(index > -1){
+
+        activePositions.splice(index, 1);
+
+      }
 
     }
 
@@ -157,7 +281,41 @@ function createPhrase(){
 
 }
 
-setInterval(createPhrase, 600);
+function startAnimation(){
+
+  if(animationInterval) return;
+
+  animationInterval = setInterval(createPhrase, 650);
+
+}
+
+function stopAnimation(){
+
+  clearInterval(animationInterval);
+
+  animationInterval = null;
+
+}
+
+document.addEventListener("visibilitychange", () => {
+
+  if(document.hidden){
+
+    stopAnimation();
+
+    gsap.globalTimeline.pause();
+
+  } else {
+
+    gsap.globalTimeline.resume();
+
+    startAnimation();
+
+  }
+
+});
+
+startAnimation();
 
 </script>
 
