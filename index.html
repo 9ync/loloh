@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VOID SEQUENCE</title>
+
+  <title>lohanne</title>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
   <style>
+
     *{
       margin:0;
       padding:0;
@@ -15,27 +17,29 @@
     }
 
     body{
-      overflow:hidden;
-      background:#fff;
-      font-family:Helvetica Neue, Arial, sans-serif;
       width:100vw;
       height:100vh;
+      overflow:hidden;
+      background:#ffffff;
+      font-family:"Helvetica Neue", Arial, sans-serif;
       position:relative;
     }
 
-    .word{
+    .phrase{
       position:absolute;
+      color:#000;
       font-size:11px;
       font-weight:200;
-      letter-spacing:2px;
-      color:#000;
+      letter-spacing:1.5px;
       opacity:0;
-      filter:blur(8px);
-      white-space:nowrap;
-      user-select:none;
-      pointer-events:none;
+      filter:blur(10px);
       transform:translateY(40px);
+
+      white-space:nowrap;
+      pointer-events:none;
+      user-select:none;
     }
+
   </style>
 </head>
 
@@ -43,61 +47,118 @@
 
 <script>
 
-const words = [
-  "XÆ-77",
-  "nvora//22",
-  "0001.aether",
-  "mnlth.exe",
-  "KZV_1999",
-  ":::::",
-  "a9x_void",
-  "LUX//NULL",
-  "_+_+_+",
-  "mmh//77",
-  "dissolve.seq",
-  "████",
-  "noform_222",
-  "zr.000",
-  "static//love"
+const repeatedPhrases = [
+
+  "eu te amo.",
+  "eu te amo muito.",
+  "eu vivo por ti.",
+  "eu amo viver você.",
+  "lohanne, eu te amo.",
+  "eu amo você, minha princesa.",
+  "eu te amo, minha garota.",
+  "eu vivo você, minha paixão.",
+  "私大好きをロハンネ！",
+  "lohanne !",
+  "anne !",
+  "ぼくのロハンネをだいすき",
+  "eu te amo eu te amo eu te amo!",
+  "eu te amo com minha alma."
+
 ];
 
-function createWord(){
+const normalPhrases = [
 
-  const el = document.createElement("div");
-  el.classList.add("word");
+  "minha garota.",
+  "minha princesinha.",
+  "minha namorada.",
+  "minha mulher.",
+  "minha gatinha.",
+  "minha rainha.",
+  "minha amada.",
+  "fabulosa.",
+  "bonita.",
+  "perfeita",
+  "gostosa.",
+  "maravilhosa.",
+  "meu anjinho.",
+  "minha pretinha.",
+  "minha miudinha.",
+  "minha rainha.",
+  "incrível.",
+  "você é perfeita lohanne.",
+  "você é demasiadamente perfeita.",
+  "você é a mais linda atemporalmente."
 
-  el.innerText = words[Math.floor(Math.random() * words.length)];
+];
 
-  const x = Math.random() * window.innerWidth;
-  const y = Math.random() * window.innerHeight;
+function getPhrase(){
 
-  el.style.left = `${x}px`;
-  el.style.top = `${y}px`;
+  const random = Math.random();
 
-  document.body.appendChild(el);
+  // 70% chance das frases principais aparecerem mais
+  if(random < 0.7){
 
-  gsap.to(el,{
+    return repeatedPhrases[
+      Math.floor(Math.random() * repeatedPhrases.length)
+    ];
+
+  } else {
+
+    return normalPhrases[
+      Math.floor(Math.random() * normalPhrases.length)
+    ];
+
+  }
+
+}
+
+function createPhrase(){
+
+  const phrase = document.createElement("div");
+
+  phrase.classList.add("phrase");
+
+  phrase.innerText = getPhrase();
+
+  const x = Math.random() * (window.innerWidth - 200);
+  const y = Math.random() * (window.innerHeight - 100);
+
+  phrase.style.left = `${x}px`;
+  phrase.style.top = `${y}px`;
+
+  document.body.appendChild(phrase);
+
+  gsap.to(phrase,{
+
     opacity:1,
     y:-60,
     filter:"blur(0px)",
+
     duration:4,
     ease:"power2.out"
+
   });
 
-  gsap.to(el,{
+  gsap.to(phrase,{
+
     opacity:0,
-    filter:"blur(6px)",
+    filter:"blur(8px)",
+
     duration:4,
     delay:4,
     ease:"power2.in",
+
     onComplete:()=>{
-      el.remove();
+
+      phrase.remove();
+
     }
+
   });
 
 }
 
-setInterval(createWord, 700);
+setInterval(createPhrase, 650);
 
 </script>
 
