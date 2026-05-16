@@ -1,19 +1,105 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>feliz dia das mulheres</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VOID SEQUENCE</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      overflow:hidden;
+      background:#fff;
+      font-family:Helvetica Neue, Arial, sans-serif;
+      width:100vw;
+      height:100vh;
+      position:relative;
+    }
+
+    .word{
+      position:absolute;
+      font-size:11px;
+      font-weight:200;
+      letter-spacing:2px;
+      color:#000;
+      opacity:0;
+      filter:blur(8px);
+      white-space:nowrap;
+      user-select:none;
+      pointer-events:none;
+      transform:translateY(40px);
+    }
+  </style>
 </head>
+
 <body>
-<h1>feliz dia das mulheres</h1>
-<p>feliz dia pra você, lohanne, não é muito, más, é o que eu consigo fazer pra você por agora,
-ainda faço um aplicativo baseado em VOCÊ, pra VOCÊ, por NÓS, com NÓS dois.</p>
+
+<script>
+
+const words = [
+  "XÆ-77",
+  "nvora//22",
+  "0001.aether",
+  "mnlth.exe",
+  "KZV_1999",
+  ":::::",
+  "a9x_void",
+  "LUX//NULL",
+  "_+_+_+",
+  "mmh//77",
+  "dissolve.seq",
+  "████",
+  "noform_222",
+  "zr.000",
+  "static//love"
+];
+
+function createWord(){
+
+  const el = document.createElement("div");
+  el.classList.add("word");
+
+  el.innerText = words[Math.floor(Math.random() * words.length)];
+
+  const x = Math.random() * window.innerWidth;
+  const y = Math.random() * window.innerHeight;
+
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+
+  document.body.appendChild(el);
+
+  gsap.to(el,{
+    opacity:1,
+    y:-60,
+    filter:"blur(0px)",
+    duration:4,
+    ease:"power2.out"
+  });
+
+  gsap.to(el,{
+    opacity:0,
+    filter:"blur(6px)",
+    duration:4,
+    delay:4,
+    ease:"power2.in",
+    onComplete:()=>{
+      el.remove();
+    }
+  });
+
+}
+
+setInterval(createWord, 700);
+
+</script>
+
 </body>
 </html>
-<h2>eu te amo</h2>
-<p>tem muitas coisas ainda que quero fazer com vc, e muitas datas que quero comemorar com vc, eu tinha esquecido dessa, tem nem 1h q pensei nisso, más sou mais que isso, tenho muitas coisas a te falar ainda.</p>
-</body>
-</html>
-<h3>bo andar 😞</h3>
-<p>aroveite bem seu dia (comigo), e bo andar, quero te ver e to com saudades princesa😢</p>
