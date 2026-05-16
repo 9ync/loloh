@@ -9,13 +9,57 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:#fff}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+background:#fff
+}
+
 body{
 position:relative;
 font-family:"Helvetica Neue",Arial,sans-serif;
 -webkit-font-smoothing:antialiased;
 text-rendering:optimizeLegibility
+}
+
+#intro{
+position:absolute;
+inset:0;
+overflow:hidden;
+z-index:1
+}
+
+#hub{
+position:absolute;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#fff;
+opacity:0;
+pointer-events:none;
+z-index:20
+}
+
+#hub.active{
+opacity:1;
+pointer-events:auto
+}
+
+.hub-text{
+font-size:14px;
+font-weight:300;
+letter-spacing:3px;
+color:#111
 }
 
 .phrase{
@@ -34,13 +78,171 @@ user-select:none;
 will-change:transform,opacity,filter
 }
 
-@media(max-width:768px){
-.phrase{font-size:10px}
+.love-button-wrap{
+position:absolute;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999
 }
+
+.love-button{
+position:relative;
+border:none;
+outline:none;
+cursor:pointer;
+
+padding:14px 30px;
+
+border-radius:999px;
+
+font-size:11px;
+font-weight:300;
+letter-spacing:2px;
+
+color:#111;
+
+background:rgba(255,255,255,.08);
+
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+
+box-shadow:
+0 4px 30px rgba(0,0,0,.04),
+inset 0 0 0 1px rgba(255,255,255,.25);
+
+overflow:hidden;
+
+transition:
+transform .4s ease,
+opacity .5s ease,
+background .4s ease
+}
+
+.love-button:hover{
+transform:scale(1.03)
+}
+
+.love-button::before{
+
+content:"";
+
+position:absolute;
+inset:0;
+
+border-radius:inherit;
+
+padding:1px;
+
+background:linear-gradient(
+120deg,
+transparent 0%,
+rgba(255,255,255,.02) 20%,
+rgba(255,255,255,.45) 50%,
+rgba(255,255,255,.02) 80%,
+transparent 100%
+);
+
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+
+animation:borderGlow 4s linear infinite;
+
+opacity:.7
+}
+
+.love-button::after{
+
+content:"";
+
+position:absolute;
+
+top:-120%;
+left:-40%;
+
+width:60%;
+height:300%;
+
+background:linear-gradient(
+to bottom,
+transparent,
+rgba(255,255,255,.35),
+transparent
+);
+
+transform:rotate(25deg);
+
+animation:shine 5s linear infinite;
+
+opacity:.5
+}
+
+@keyframes shine{
+
+0%{
+transform:translateX(-250%) rotate(25deg)
+}
+
+100%{
+transform:translateX(450%) rotate(25deg)
+}
+
+}
+
+@keyframes borderGlow{
+
+0%{
+opacity:.35
+}
+
+50%{
+opacity:.75
+}
+
+100%{
+opacity:.35
+}
+
+}
+
+@media(max-width:768px){
+
+.phrase{
+font-size:10px
+}
+
+.love-button{
+font-size:10px;
+padding:13px 26px
+}
+
+}
+
 </style>
 </head>
 
 <body translate="no">
+
+<div id="intro">
+
+<div class="love-button-wrap">
+<button class="love-button" id="enterButton">
+i luv u 𖹭
+</button>
+</div>
+
+</div>
+
+<div id="hub">
+<div class="hub-text">
+new hub.
+</div>
+</div>
 
 <script>
 
@@ -53,8 +255,13 @@ const secondary=[
 ];
 
 const occupied=[];
+const intro=document.getElementById("intro");
+const hub=document.getElementById("hub");
+const button=document.getElementById("enterButton");
+
 let running=true;
 let loop=null;
+let entered=false;
 
 function phraseText(){
 return Math.random()<0.75
@@ -97,16 +304,20 @@ return null;
 
 function createPhrase(){
 
-if(!running || document.hidden) return;
+if(!running || document.hidden || entered) return;
 
 const el=document.createElement("div");
+
 el.className="phrase";
+
 el.setAttribute("translate","no");
+
 el.innerText=phraseText();
 
-document.body.appendChild(el);
+intro.appendChild(el);
 
 const rect=el.getBoundingClientRect();
+
 const pos=freePosition(rect.width,rect.height);
 
 if(!pos){
@@ -153,9 +364,13 @@ el.remove();
 }
 
 function start(){
-if(loop) return;
+
+if(loop || entered) return;
+
 running=true;
+
 loop=setInterval(createPhrase,700);
+
 }
 
 function stop(){
@@ -163,6 +378,7 @@ function stop(){
 running=false;
 
 clearInterval(loop);
+
 loop=null;
 
 gsap.globalTimeline.pause();
@@ -175,20 +391,83 @@ if(document.hidden){
 
 stop();
 
-}else{
+}else if(!entered){
 
 gsap.globalTimeline.resume();
+
 start();
 
 }
 
 });
 
-window.addEventListener("blur",stop);
+window.addEventListener("blur",()=>{
+
+if(!entered) stop();
+
+});
 
 window.addEventListener("focus",()=>{
+
+if(!entered){
+
 gsap.globalTimeline.resume();
+
 start();
+
+}
+
+});
+
+button.addEventListener("click",()=>{
+
+if(entered) return;
+
+entered=true;
+
+running=false;
+
+clearInterval(loop);
+
+button.style.pointerEvents="none";
+
+gsap.to(button,{
+opacity:0,
+scale:.96,
+duration:.6,
+ease:"power2.out"
+});
+
+const phrases=document.querySelectorAll(".phrase");
+
+phrases.forEach((el)=>{
+
+gsap.to(el,{
+opacity:0,
+filter:"blur(14px)",
+duration:.9,
+ease:"power2.out",
+onComplete:()=>{
+el.remove();
+}
+});
+
+});
+
+setTimeout(()=>{
+
+intro.style.display="none";
+
+hub.classList.add("active");
+
+gsap.to(hub,{
+opacity:1,
+duration:1.2,
+ease:"power2.out"
+});
+
+},1000);
+
 });
 
 start();
