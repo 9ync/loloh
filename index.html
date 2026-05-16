@@ -1,321 +1,197 @@
 <!DOCTYPE html>
 <html lang="pt-BR" translate="no">
-
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="google" content="notranslate">
+<title>lohanne</title>
 
-  <meta charset="UTF-8" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#fff}
+body{
+position:relative;
+font-family:"Helvetica Neue",Arial,sans-serif;
+-webkit-font-smoothing:antialiased;
+text-rendering:optimizeLegibility
+}
 
-  <meta name="google" content="notranslate" />
+.phrase{
+position:absolute;
+color:#000;
+font-size:11px;
+font-weight:200;
+letter-spacing:1px;
+line-height:1.4;
+opacity:0;
+filter:blur(10px);
+transform:translateY(35px);
+white-space:nowrap;
+pointer-events:none;
+user-select:none;
+will-change:transform,opacity,filter
+}
 
-  <title>lohanne</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-
-  <style>
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html,
-    body{
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:#ffffff;
-      touch-action:none;
-    }
-
-    body{
-
-      position:relative;
-
-      font-family:
-      "Helvetica Neue",
-      Arial,
-      sans-serif;
-
-      -webkit-font-smoothing:antialiased;
-      text-rendering:optimizeLegibility;
-
-    }
-
-    .phrase{
-
-      position:absolute;
-
-      color:#000;
-
-      font-size:11px;
-      font-weight:200;
-
-      letter-spacing:1.2px;
-      line-height:1.4;
-
-      opacity:0;
-
-      filter:blur(10px);
-
-      transform:translateY(40px);
-
-      white-space:nowrap;
-
-      pointer-events:none;
-      user-select:none;
-
-      will-change:
-      transform,
-      opacity,
-      filter;
-
-    }
-
-    @media (max-width:768px){
-
-      .phrase{
-
-        font-size:10px;
-        letter-spacing:1px;
-
-      }
-
-    }
-
-  </style>
-
+@media(max-width:768px){
+.phrase{font-size:10px}
+}
+</style>
 </head>
 
 <body translate="no">
 
 <script>
 
-const repeatedPhrases = [
-
-  "eu te amo.",
-  "eu te amo muito.",
-  "eu vivo por ti.",
-  "eu amo viver você.",
-  "lohanne, eu te amo.",
-  "eu amo você, minha princesa.",
-  "eu te amo, minha garota.",
-  "eu vivo você, minha paixão.",
-  "私大好きをロハンネ！",
-  "lohanne !",
-  "anne !",
-  "ぼくのロハンネをだいすき",
-  "eu te amo eu te amo eu te amo!",
-  "eu te amo com minha alma."
-
+const repeated=[
+"eu te amo.","eu te amo muito.","eu vivo por ti.","eu amo viver você.","lohanne, eu te amo.","eu amo você, minha princesa.","eu te amo, minha garota.","eu vivo você, minha paixão.","私大好きをロハンネ！","lohanne !","anne !","ぼくのロハンネをだいすき","eu te amo eu te amo eu te amo!","eu te amo com minha alma."
 ];
 
-const secondaryPhrases = [
-
-  "minha garota.",
-  "minha princesinha.",
-  "minha namorada.",
-  "minha mulher.",
-  "minha gatinha.",
-  "minha rainha.",
-  "minha amada.",
-  "fabulosa.",
-  "bonita.",
-  "perfeita.",
-  "gostosa.",
-  "maravilhosa.",
-  "meu anjinho.",
-  "minha pretinha.",
-  "minha miudinha.",
-  "minha rainha.",
-  "incrível.",
-  "você é perfeita lohanne.",
-  "você é demasiadamente perfeita.",
-  "você é a mais linda atemporalmente."
-
+const secondary=[
+"minha garota.","minha princesinha.","minha namorada.","minha mulher.","minha gatinha.","minha rainha.","minha amada.","fabulosa.","bonita.","perfeita.","gostosa.","maravilhosa.","meu anjinho.","minha pretinha.","minha miudinha.","incrível.","você é perfeita lohanne.","você é demasiadamente perfeita.","você é a mais linda atemporalmente."
 ];
 
-function getPhrase(){
+const occupied=[];
+let running=true;
+let loop=null;
 
-  const priorityChance = Math.random();
+function phraseText(){
+return Math.random()<0.75
+? repeated[Math.floor(Math.random()*repeated.length)]
+: secondary[Math.floor(Math.random()*secondary.length)];
+}
 
-  if(priorityChance < 0.75){
+function freePosition(w,h){
 
-    return repeatedPhrases[
-      Math.floor(Math.random() * repeatedPhrases.length)
-    ];
+const padding=25;
 
-  }
+for(let i=0;i<200;i++){
 
-  return secondaryPhrases[
-    Math.floor(Math.random() * secondaryPhrases.length)
-  ];
+const x=Math.random()*(window.innerWidth-w-padding);
+const y=Math.random()*(window.innerHeight-h-padding);
+
+let overlap=false;
+
+for(const p of occupied){
+
+if(
+x<p.x+p.w+20 &&
+x+w+20>p.x &&
+y<p.y+p.h+20 &&
+y+h+20>p.y
+){
+overlap=true;
+break;
+}
 
 }
 
-const activePositions = [];
+if(!overlap) return {x,y};
 
-let animationInterval = null;
+}
+
+return null;
+
+}
 
 function createPhrase(){
 
-  if(document.hidden) return;
+if(!running || document.hidden) return;
 
-  const phrase = document.createElement("div");
+const el=document.createElement("div");
+el.className="phrase";
+el.setAttribute("translate","no");
+el.innerText=phraseText();
 
-  phrase.className = "phrase";
+document.body.appendChild(el);
 
-  phrase.setAttribute("translate", "no");
+const rect=el.getBoundingClientRect();
+const pos=freePosition(rect.width,rect.height);
 
-  phrase.innerText = getPhrase();
+if(!pos){
+el.remove();
+return;
+}
 
-  document.body.appendChild(phrase);
+el.style.left=pos.x+"px";
+el.style.top=pos.y+"px";
 
-  const rect = phrase.getBoundingClientRect();
+occupied.push({
+x:pos.x,
+y:pos.y,
+w:rect.width,
+h:rect.height,
+el
+});
 
-  const margin = 30;
+gsap.to(el,{
+opacity:1,
+y:-55,
+filter:"blur(0px)",
+duration:3.8,
+ease:"power2.out"
+});
 
-  const maxX = window.innerWidth - rect.width - margin;
-  const maxY = window.innerHeight - rect.height - margin;
+gsap.to(el,{
+opacity:0,
+filter:"blur(8px)",
+duration:3.8,
+delay:3.8,
+ease:"power2.in",
+onComplete:()=>{
 
-  let x;
-  let y;
+const index=occupied.findIndex(p=>p.el===el);
 
-  let validPosition = false;
+if(index!==-1) occupied.splice(index,1);
 
-  let tries = 0;
+el.remove();
 
-  while(!validPosition && tries < 100){
-
-    x = Math.random() * maxX;
-    y = Math.random() * maxY;
-
-    validPosition = true;
-
-    for(const pos of activePositions){
-
-      const horizontalOverlap =
-
-        x < pos.x + pos.width + 20 &&
-        x + rect.width + 20 > pos.x;
-
-      const verticalOverlap =
-
-        y < pos.y + pos.height + 20 &&
-        y + rect.height + 20 > pos.y;
-
-      if(horizontalOverlap && verticalOverlap){
-
-        validPosition = false;
-        break;
-
-      }
-
-    }
-
-    tries++;
-
-  }
-
-  phrase.style.left = `${x}px`;
-  phrase.style.top = `${y}px`;
-
-  const currentPosition = {
-
-    x,
-    y,
-    width: rect.width,
-    height: rect.height
-
-  };
-
-  activePositions.push(currentPosition);
-
-  gsap.to(phrase,{
-
-    opacity:1,
-
-    y:-65,
-
-    filter:"blur(0px)",
-
-    duration:4,
-
-    ease:"power2.out"
-
-  });
-
-  gsap.to(phrase,{
-
-    opacity:0,
-
-    filter:"blur(8px)",
-
-    duration:4,
-
-    delay:4,
-
-    ease:"power2.in",
-
-    onComplete:()=>{
-
-      phrase.remove();
-
-      const index = activePositions.indexOf(currentPosition);
-
-      if(index > -1){
-
-        activePositions.splice(index, 1);
-
-      }
-
-    }
-
-  });
+}
+});
 
 }
 
-function startAnimation(){
+function start(){
+if(loop) return;
+running=true;
+loop=setInterval(createPhrase,700);
+}
 
-  if(animationInterval) return;
+function stop(){
 
-  animationInterval = setInterval(createPhrase, 650);
+running=false;
+
+clearInterval(loop);
+loop=null;
+
+gsap.globalTimeline.pause();
 
 }
 
-function stopAnimation(){
+document.addEventListener("visibilitychange",()=>{
 
-  clearInterval(animationInterval);
+if(document.hidden){
 
-  animationInterval = null;
+stop();
+
+}else{
+
+gsap.globalTimeline.resume();
+start();
 
 }
-
-document.addEventListener("visibilitychange", () => {
-
-  if(document.hidden){
-
-    stopAnimation();
-
-    gsap.globalTimeline.pause();
-
-  } else {
-
-    gsap.globalTimeline.resume();
-
-    startAnimation();
-
-  }
 
 });
 
-startAnimation();
+window.addEventListener("blur",stop);
+
+window.addEventListener("focus",()=>{
+gsap.globalTimeline.resume();
+start();
+});
+
+start();
 
 </script>
 
